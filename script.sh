@@ -14,23 +14,22 @@
 #fi 
 function validate_date()
 {
+ a=$(echo $1 |  awk -F/ '{ if ( $1 <= 31 && $1 >= 1 )  print $1    }')
+ b=$(echo $1 |  awk -F/ '{ if ( $2 <= 12 && $2 >= 1 )  print $2    }')
+ c=$(echo $1 |  awk -F/ '{ if ( $3 >= 1 && $3 <= 9999 )  print $3  }')
+ echo $a $b $c
   
-  echo $(date "+%d/%m/%Y" -d "$1") 2>1 > /dev/null
-  is_date=$?
-  echo $is_date
-  if [[ "$is_date" == "0" ]]; then
+  if [[ $1 == [0-3][0-9]/[0-1][0-9]/[0-9][0-9][0-9][0-9] ]]; then
      echo "Date validates fine"
-  else
+   else
      echo "Date $1 not  validated properly.  use this eg. 21/05/2015"
-  fi
+     exit
+   fi
 }
 
 function move_pics_to_folder()
 {
-  validate_date $2
-  validate_date $3 
-
-
+  
  filetype=( jpg png txt )
 
  for f in "${filetype[@]}"
@@ -43,19 +42,33 @@ function move_pics_to_folder()
 }
 
 
-echo "Enter folder name, Start Day, End Day ./script "'Photo Folder'" 2015-14-01 2015-14-03";
-read foldername start end
- 
-echo $foldername $start $end
-  
-  if [ ! -d $foldername ];
+#start of program
+
+  if [ "$#" -gt "3" -o "$#" -lt "3" ]; then
+   echo "Three Requirements need 'Folder Name' 'Start Time' 'Stop Time' "
+   exit 
+  fi
+   
+#If dates are not null then validated the date
+  if [ -z "$2" -o -z "$3" ]; then
+       echo "Empty dates"
+       exit
+     else 
+        echo "Validating dates...."
+        validate_date $2  
+        validate_date $3
+  fi
+
+#create folder if required
+
+ if [ ! -d $1 ];
   then
        echo "Creating folder $foldername in $(pwd) directory"
-       mkdir $foldername
-       move_pics_to_folder $foldername $start $end
+       mkdir $1
+       move_pics_to_folder $1 $2 $3
    else 
        echo "Folder Exists"
-       #_move_pics_to_folder($foldername)
+       move_pics_to_folder $1 $2 $3
 fi
 
 
