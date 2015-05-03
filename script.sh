@@ -1,57 +1,59 @@
 #!/bin/bash
 
-#read foldername start end
-
-#b=$(date -d "${start}"  +"%Y%m%d")
-#d=$(date -d "${end}"  +"%Y%m%d")
-#echo $b
-#echo $d
-
-#if [ "$b" -ge "$d" ]; then
- #  echo "$b > $d"
-#else
- #  echo "$b < $d"
-#fi 
 function validate_date()
 {
- a=$(echo $1 |  awk -F/ '{ if ( $1 <= 31 && $1 >= 1 )  print $1    }')
- b=$(echo $1 |  awk -F/ '{ if ( $2 <= 12 && $2 >= 1 )  print $2    }')
- c=$(echo $1 |  awk -F/ '{ if ( $3 >= 1 && $3 <= 9999 )  print $3  }')
- echo $a $b $c
-  
-  if [[ $1 == [0-3][0-9]/[0-1][0-9]/[0-9][0-9][0-9][0-9] ]]; then
+
+  if [[ $1 == [0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9] ]]; then
+
+ 
+       a=$(echo $1 |  awk -F- '{ if ( $3 >= 1 && $3 <= 31 )  print $3    }')
+       b=$(echo $1 |  awk -F- '{ if ( $2 >= 1 && $2 <= 12 )  print $2    }')
+       c=$(echo $1 |  awk -F- '{ if ( $1 >= 1 && $1 <= 9999 )  print $1  }')
+     
+       #The below needs redoing. Not sensible programming
+
+      if [ -z $a ]; then
+        echo "$1 has an invalid day"
+        exit
+      elif [ -z $b ]; then
+        echo "$1 has an invalid month"
+        exit
+      elif [ -z $c ]; then
+        echo "$1 has an invalid year"     
+        exit
+      fi
+        
      echo "Date validates fine"
    else
-     echo "Date $1 not  validated properly.  use this eg. 21/05/2015"
+     echo "Date $1 not  validated properly.  use this eg. 2015-05-01 12:50:00"
      exit
    fi
 }
 
 function move_pics_to_folder()
 {
-  
- filetype=( jpg png txt )
-
- for f in "${filetype[@]}"
-    do
-	for s in $(stat *.$f | grep -i -e 'change: ' -e 'File: ' | awk '{print $2}')
-	do           
- 		echo $s
-	done
-     done
+  #Need to fix the time between search along with the date 
+  a="00:00:00"
+ 
+  for i in `find . -maxdepth 1 -newermt "$2 $a" ! -newermt "$3 $a" -type f`; 
+  do
+     echo "Found this file $i to move"
+     mv $i /$1/
+     echo "Moved this file $i to $1 folder" 
+   done
 }
 
 
 #start of program
 
   if [ "$#" -gt "3" -o "$#" -lt "3" ]; then
-   echo "Three Requirements need 'Folder Name' 'Start Time' 'Stop Time' "
+   echo "Three Requirements needed 'FolderName' 'Start Date Time' 'End Date Time' "
    exit 
   fi
    
 #If dates are not null then validated the date
   if [ -z "$2" -o -z "$3" ]; then
-       echo "Empty dates"
+       echo "Need the start date and end dates for searching"
        exit
      else 
         echo "Validating dates...."
@@ -63,11 +65,11 @@ function move_pics_to_folder()
 
  if [ ! -d $1 ];
   then
-       echo "Creating folder $foldername in $(pwd) directory"
+       echo "Creating folder $1 in $(pwd) directory"
        mkdir $1
        move_pics_to_folder $1 $2 $3
    else 
-       echo "Folder Exists"
+       echo "$1 Folder Exists"
        move_pics_to_folder $1 $2 $3
 fi
 
