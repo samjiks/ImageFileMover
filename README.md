@@ -11,7 +11,7 @@ Make this file executable
 
 Use this script arguments 
 
-./script.sh FolderName 04-05-2015 04-09-2015
+"./script.sh FolderName 04-05-2015 04-09-2015
 
 Where FolderName can be arbitarly used to your suitable Foldername
 
