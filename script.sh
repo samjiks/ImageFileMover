@@ -23,9 +23,9 @@ function validate_date()
         exit
       fi
         
-     echo "Date validates fine"
+     echo "Date $1 validates fine"
    else
-     echo "Date $1 not  validated properly.  use this eg. 2015-05-01 12:50:00"
+     echo "Date $1 not validated properly.  use this eg. 2015-05-01 12:50:00"
      exit
    fi
 }
@@ -35,10 +35,10 @@ function move_pics_to_folder()
   #Need to fix the time between search along with the date 
   a="00:00:00"
  
-  for i in `find . -maxdepth 1 -newermt "$2 $a" ! -newermt "$3 $a" -type f`; 
+  for i in `find . -maxdepth 1 -type f -regextype posix-extended -regex ".*\.(jpg|png|gif)"  -newermt "$2 $a" ! -newermt "$3 $a"`; 
   do
      echo "Found this file $i to move"
-     mv $i /$1/
+     mv $i $1/
      echo "Moved this file $i to $1 folder" 
    done
 }
