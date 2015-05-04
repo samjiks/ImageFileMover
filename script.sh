@@ -57,8 +57,11 @@ function move_pics_to_folder()
        exit
      else 
         echo "Validating dates...."
-        validate_date $2  
-        validate_date $3
+     
+     for i in $2 $3; 
+      do
+        validate_date $i  
+      done
   fi
 
 #create folder if required
