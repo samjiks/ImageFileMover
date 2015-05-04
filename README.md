@@ -6,6 +6,7 @@ How to use?
 Download and move this script file to a folder where all jpg,gif,png files are located and where you would like to move based on date and time.
 
 Make this file executable
+
 #chmod a+x script.sh (sudo if you are not root)
 
 Use this script arguments 
